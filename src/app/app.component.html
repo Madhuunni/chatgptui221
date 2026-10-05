@@ -33,13 +33,16 @@
             <article class="message" [class.user-message]="message.role === 'user'" [attr.aria-label]="message.role === 'user' ? 'You' : 'Assistant'">
               @if (message.role === 'assistant') { <span class="assistant-symbol"><app-icon name="spark" /></span> }
               <div class="message-body"><div class="message-text">{{ message.content }}</div>
+                @if (message.role === 'assistant' && message.details; as details) {
+                  <app-json-details [data]="details" />
+                }
                 @if (message.role === 'assistant' && message.report; as report) {
                   <a class="report-download" [href]="report.url" [attr.download]="report.fileName" aria-label="Download report as an Excel workbook">
                     <app-icon name="excel" />
                     <span>Click here to download the report<small>Excel workbook (.xlsx)</small></span>
                   </a>
                 }
-                @if (message.role === 'assistant') { <button class="icon-button copy-button" (click)="copy(message.id, message.content)" [attr.aria-label]="copied() === message.id ? 'Copied' : 'Copy response'" [title]="copied() === message.id ? 'Copied' : 'Copy response'"><app-icon [name]="copied() === message.id ? 'check' : 'copy'" /></button> }
+                @if (message.role === 'assistant') { <button class="icon-button copy-button" (click)="copy(message.id, message.content + (message.details ? '\n\n' + formatDetails(message.details) : ''))" [attr.aria-label]="copied() === message.id ? 'Copied' : 'Copy response'" [title]="copied() === message.id ? 'Copied' : 'Copy response'"><app-icon [name]="copied() === message.id ? 'check' : 'copy'" /></button> }
               </div>
             </article>
           }
