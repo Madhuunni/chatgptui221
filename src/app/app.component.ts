@@ -1,9 +1,11 @@
 import { Component, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
+import { JsonDetailsComponent } from './shared/json-details.component';
 import { FormsModule } from '@angular/forms';
+import { ResponseDetails } from './core/chat.models';
 import { ChatStore } from './core/chat.store';
 import { IconComponent } from './shared/icon.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-@Component({ selector: 'app-root', imports: [FormsModule, IconComponent, SidebarComponent], templateUrl: './app.component.html' })
+@Component({ selector: 'app-root', imports: [FormsModule, IconComponent, SidebarComponent, JsonDetailsComponent], templateUrl: './app.component.html' })
 export class AppComponent {
   readonly store = inject(ChatStore);
   readonly sidebarOpen = signal(window.innerWidth > 760);
@@ -39,6 +41,9 @@ export class AppComponent {
   usePrompt(prompt: string): void { this.draft = prompt; this.resize(); this.composer()?.nativeElement.focus(); }
   onKey(event: KeyboardEvent): void { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); this.send(); } }
   resize(): void { requestAnimationFrame(() => { const el = this.composer()?.nativeElement; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; } }); }
+  formatDetails(details: ResponseDetails): string {
+    return Object.entries(details).map(([key, value]) => `${key}: ${value ?? '—'}`).join('\n');
+  }
   async copy(id: string, content: string): Promise<void> {
     try { await navigator.clipboard.writeText(content); this.copied.set(id); setTimeout(() => this.copied.update(value => value === id ? null : value), 2000); }
     catch { this.notice.set('Copy is unavailable. Select the response text to copy it manually.'); }
